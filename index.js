@@ -7,7 +7,8 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-// Simple POST route to send prompt to Gemini
+const PORT = process.env.PORT || 5000;  // IMPORTANT for Render!
+
 app.post("/ask", async (req, res) => {
   try {
     const { prompt } = req.body;
@@ -16,9 +17,7 @@ app.post("/ask", async (req, res) => {
       return res.status(400).json({ error: "Prompt is required" });
     }
 
-    
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
-
 
     const response = await axios.post(url, {
       contents: [
@@ -33,13 +32,14 @@ app.post("/ask", async (req, res) => {
       "No response received";
 
     res.json({ reply: aiText });
+
   } catch (error) {
     console.error("Gemini API Error:", error.response?.data || error.message);
     res.status(500).json({ error: "Failed to get response from Gemini API" });
   }
 });
 
-// Start server
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
+// START SERVER PROPERLY FOR RENDER
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
