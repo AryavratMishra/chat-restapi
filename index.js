@@ -7,8 +7,12 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-const PORT = process.env.PORT || 5000;  // IMPORTANT for Render!
+// ---- ROOT ROUTE (REQUIRED for uptime ping) ----
+app.get("/", (req, res) => {
+  res.send("Backend running");
+});
 
+// ---- ASK ROUTE ----
 app.post("/ask", async (req, res) => {
   try {
     const { prompt } = req.body;
@@ -32,14 +36,14 @@ app.post("/ask", async (req, res) => {
       "No response received";
 
     res.json({ reply: aiText });
-
   } catch (error) {
     console.error("Gemini API Error:", error.response?.data || error.message);
     res.status(500).json({ error: "Failed to get response from Gemini API" });
   }
 });
 
-// START SERVER PROPERLY FOR RENDER
+// ---- FIXED START SERVER FOR RENDER ----
+const PORT = process.env.PORT || 5000;  // Render requires this
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
